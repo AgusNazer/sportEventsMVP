@@ -37,16 +37,18 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     );
 
     @Query("""
-        SELECT e FROM Event e
-        WHERE e.activo = true
-          AND (:sportSlug IS NULL OR e.sport.slug = :sportSlug)
-          AND (:provincia IS NULL OR LOWER(e.location.provincia) = LOWER(:provincia))
-          AND (:nivel IS NULL OR e.nivel = :nivel)
-        ORDER BY e.fecha ASC
-    """)
+    SELECT e FROM Event e
+    JOIN FETCH e.sport s
+    JOIN FETCH e.location l
+    WHERE e.activo = true
+      AND (:sportSlug IS NULL OR s.slug = :sportSlug)
+      AND (:provincia IS NULL OR LOWER(l.provincia) = LOWER(:provincia))
+      AND (:nivel IS NULL OR e.nivel = :nivel)
+    ORDER BY e.fecha ASC
+""")
     List<Event> findWithFilters(
-        @Param("sportSlug") String sportSlug,
-        @Param("provincia") String provincia,
-        @Param("nivel") EventLevel nivel
+            @Param("sportSlug") String sportSlug,
+            @Param("provincia") String provincia,
+            @Param("nivel") EventLevel nivel
     );
 }
