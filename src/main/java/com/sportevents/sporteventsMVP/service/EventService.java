@@ -64,11 +64,17 @@ public class EventService {
         }
 
         // Query general con filtros opcionales
-        return eventRepository.findWithFilters(sport, provincia, nivel)
+
+        String nivelStr = nivel != null ? nivel.name() : null;
+        return eventRepository.findWithFilters(
+                sport,      // ← usá la variable normalizada
+                provincia,  // ← usá la variable normalizada
+                nivelStr       // ← usá la variable normalizada
+                )
                 .stream()
                 .map(EventResponse::from)
                 .toList();
-    }
+        }
 
     public List<EventResponse> getThisWeekend() {
         LocalDate today = LocalDate.now();
