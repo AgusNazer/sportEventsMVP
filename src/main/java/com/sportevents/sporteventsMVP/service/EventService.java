@@ -6,6 +6,7 @@ import com.sportevents.sporteventsMVP.dto.EventResponse;
 import com.sportevents.sporteventsMVP.entity.Event;
 import com.sportevents.sporteventsMVP.entity.Location;
 import com.sportevents.sporteventsMVP.entity.Sport;
+import com.sportevents.sporteventsMVP.enums.EventLevel;
 import com.sportevents.sporteventsMVP.repository.EventRepository;
 import com.sportevents.sporteventsMVP.repository.LocationRepository;
 import com.sportevents.sporteventsMVP.repository.SportRepository;
@@ -47,7 +48,12 @@ public class EventService {
     }
 
     public List<EventResponse> filter(EventFilterRequest req) {
-        // Si hay rango de fechas, usamos esa query
+        // Normalizamos filtros vacíos → null
+        String sport = (req.sport() != null && !req.sport().isBlank()) ? req.sport() : null;
+        String provincia = (req.provincia() != null && !req.provincia().isBlank()) ? req.provincia() : null;
+        EventLevel nivel = req.nivel() != null ? req.nivel() : null;
+
+        // Si hay rango de fechas
         if (req.desde() != null || req.hasta() != null) {
             LocalDate desde = req.desde() != null ? req.desde() : LocalDate.now();
             LocalDate hasta = req.hasta() != null ? req.hasta() : LocalDate.now().plusYears(1);
@@ -57,7 +63,8 @@ public class EventService {
                     .toList();
         }
 
-        return eventRepository.findWithFilters(req.sport(), req.provincia(), req.nivel())
+        // Query general con filtros opcionales
+        return eventRepository.findWithFilters(sport, provincia, nivel)
                 .stream()
                 .map(EventResponse::from)
                 .toList();
