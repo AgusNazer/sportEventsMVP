@@ -54,4 +54,12 @@ public class AuthService {
         String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRol().name());
         return new AuthResponse(token, user.getEmail(), user.getRol().name());
     }
+    public AuthResponse getFromToken(String token) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new IllegalArgumentException("Token inválido");
+        }
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        String rol = jwtTokenProvider.getRolFromToken(token);
+        return new AuthResponse(null, email, rol);
+    }
 }
