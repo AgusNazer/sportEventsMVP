@@ -40,7 +40,7 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRol().name());
-        return new AuthResponse(token, user.getEmail(), user.getRol().name());
+        return new AuthResponse(token, user.getEmail(), user.getNombre(), user.getRol().name());
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -52,14 +52,15 @@ public class AuthService {
         }
 
         String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRol().name());
-        return new AuthResponse(token, user.getEmail(), user.getRol().name());
+        return new AuthResponse(token, user.getEmail(), user.getNombre(), user.getRol().name());
     }
     public AuthResponse getFromToken(String token) {
         if (!jwtTokenProvider.validateToken(token)) {
             throw new IllegalArgumentException("Token inválido");
         }
         String email = jwtTokenProvider.getEmailFromToken(token);
-        String rol = jwtTokenProvider.getRolFromToken(token);
-        return new AuthResponse(null, email, rol);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        return new AuthResponse(null, user.getEmail(), user.getNombre(), user.getRol().name());
     }
 }

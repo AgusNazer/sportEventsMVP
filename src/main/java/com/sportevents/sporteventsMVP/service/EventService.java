@@ -96,7 +96,7 @@ public class EventService {
 
         Event event = Event.builder()
                 .nombre(req.nombre())
-                .slug(generateSlug(req.nombre()))
+                .slug(generateSlug(req.nombre(), req.fecha()))
                 .sport(sport)
                 .location(location)
                 .fecha(req.fecha())
@@ -119,13 +119,14 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    private String generateSlug(String nombre) {
+    private String generateSlug(String nombre, LocalDate fecha) {
         String normalized = Normalizer.normalize(nombre, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
                 .toLowerCase()
                 .trim()
                 .replaceAll("[^a-z0-9\\s-]", "")
-                .replaceAll("\\s+", "-");
-        return normalized + "-" + UUID.randomUUID().toString().substring(0, 6);
+                .replaceAll("\\s+", "-")
+                .replaceAll("-+", "-");
+        return normalized + "-" + fecha.toString();
     }
 }
