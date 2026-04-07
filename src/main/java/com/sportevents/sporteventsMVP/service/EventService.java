@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -93,6 +94,25 @@ public class EventService {
 
         Location location = locationRepository.findById(req.locationId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ubicación no encontrada"));
+
+        //  Generamos el slug ANTES de crear el objeto
+        String slug = generateSlug(req.nombre(), req.fecha());
+
+        // verificamos si ya existe un evento con ese slug
+        Optional<Event> existing = eventRepository.findBySlug(slug);
+
+        if (existing.isPresent()) {
+            // devolver el existente (NO rompe, evita duplicados)
+            return EventResponse.from(existing.get());
+
+            //  OPCIÓN MEJOR (si querés actualizar):
+        /*
+        Event e = existing.get();
+        e.setUpdatedAt(LocalDateTime.now());
+        e.setPrecio(req.precio()); // ejemplo si querés actualizar algo
+        return EventResponse.from(eventRepository.save(e));
+        */
+        }
 
         Event event = Event.builder()
                 .nombre(req.nombre())
