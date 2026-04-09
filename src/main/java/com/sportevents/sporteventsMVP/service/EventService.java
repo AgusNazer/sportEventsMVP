@@ -32,6 +32,7 @@ public class EventService {
     public List<EventResponse> getAll() {
         return eventRepository.findByActivoTrueOrderByFechaAsc()
                 .stream()
+                .filter(e -> !e.getFecha().isBefore(LocalDate.now()))
                 .map(EventResponse::from)
                 .toList();
     }

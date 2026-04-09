@@ -41,6 +41,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     JOIN sports s ON s.id = e.sport_id
     JOIN locations l ON l.id = e.location_id
     WHERE e.activo = true
+      AND e.fecha >= CURRENT_DATE
       AND (CAST(:sportSlug AS varchar) IS NULL OR s.slug = :sportSlug)
       AND (CAST(:provincia AS varchar) IS NULL OR l.provincia ILIKE :provincia)
       AND (CAST(:nivel AS varchar) IS NULL OR e.nivel = CAST(:nivel AS varchar))
