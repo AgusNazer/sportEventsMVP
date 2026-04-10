@@ -2,6 +2,7 @@ package com.sportevents.sporteventsMVP.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,6 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
+        // Si no hay header, buscá la cookie
+        if (request.getCookies() != null) {
+            for (Cookie c : request.getCookies()) {
+                if ("auth_token".equals(c.getName())) {
+                    return c.getValue();
+                }
+            }
+        }
+
         return null;
     }
 }
